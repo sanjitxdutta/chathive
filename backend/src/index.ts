@@ -32,27 +32,27 @@ wss.on("connection", (socket) => {
     users.push(user);
     console.log(`${user.name} connected`);
 
-    socket.on("message", (msg) => {
+    socket.on("message", (data) => {
         try {
-            const data = JSON.parse(msg.toString());
+            const msg = JSON.parse(data.toString());
 
-            if (data.type === "join-room") {
-                const { room } = data;
-                user.name = generateUniqueName(room);
-                user.room = room;
+            if (msg.type === "join") {
+                user.room = msg.room;
+                user.name = generateUniqueName(user.room);
 
-                console.log(`${user.name} joined room ${room}`);
+                console.log(`${user.name} joined room: ${user.room}`);
+
                 socket.send(
                     JSON.stringify({
-                        type: "room-joined",
-                        room,
+                        type: "welcome",
                         name: user.name,
-                        usersInRoom: users.filter((u) => u.room === room).length,
+                        room: user.room,
+                        usersInRoom: users.filter((u) => u.room === user.room).length,
                     })
                 );
             }
-        } catch (e) {
-            console.error("Invalid message", e);
+        } catch (err) {
+            console.error("Invalid message:", err);
         }
     });
 
