@@ -1,64 +1,111 @@
 import { WebSocketServer, WebSocket } from "ws";
 import { randomName } from "./utils/names.js";
-import { randomUUID } from "crypto";
-
-interface User {
-    id: string;
-    name: string;
-    room: string | null;
-    socket: WebSocket;
-}
-
-let users: User[] = [];
 
 const wss = new WebSocketServer({ port: 8080 });
 
-function generateUniqueName(room: string | null): string {
+interface User {
+    socket: WebSocket;
+    room: string;
+    name: string;
+}
+
+let allSockets: User[] = [];
+
+function isValidRoomId(id: string): boolean {
+    return /^[0-9a-f]{4,32}$/.test(id);
+}
+
+function generateUniqueName(room: string): string {
     let name: string;
     do {
         name = randomName();
-    } while (users.some((u) => u.room === room && u.name === name));
+    } while (allSockets.some((u) => u.room === room && u.name === name));
     return name;
 }
 
+function broadcastToRoom(room: string, message: any, excludeSocket?: WebSocket) {
+    allSockets.forEach((user) => {
+        if (user.room === room && user.socket !== excludeSocket) {
+            user.socket.send(JSON.stringify(message));
+        }
+    });
+}
+
 wss.on("connection", (socket) => {
-    const user: User = {
-        id: randomUUID(),
-        name: generateUniqueName(null),
-        room: null,
-        socket,
-    };
+    console.log("New client connected");
 
-    users.push(user);
-    console.log(`${user.name} connected`);
+    socket.on("message", (message) => {
+        let parsedMessage;
 
-    socket.on("message", (data) => {
         try {
-            const msg = JSON.parse(data.toString());
+            parsedMessage = JSON.parse(message.toString());
+        } catch (err) {
+            console.error("Invalid JSON:", message.toString());
+            return;
+        }
 
-            if (msg.type === "join") {
-                user.room = msg.room;
-                user.name = generateUniqueName(user.room);
+        if (parsedMessage.type === "join") {
+            const { roomId } = parsedMessage.payload;
 
-                console.log(`${user.name} joined room: ${user.room}`);
-
+            if (!roomId || !isValidRoomId(roomId)) {
                 socket.send(
                     JSON.stringify({
-                        type: "welcome",
-                        name: user.name,
-                        room: user.room,
-                        usersInRoom: users.filter((u) => u.room === user.room).length,
+                        type: "error",
+                        message: "Invalid Room ID. Must be hex (4–32 chars, only 0-9a-f).",
                     })
                 );
+                return;
             }
-        } catch (err) {
-            console.error("Invalid message:", err);
+
+            const name = generateUniqueName(roomId);
+            allSockets.push({ socket, room: roomId, name });
+
+            console.log(`${name} joined room: ${roomId}`);
+
+            socket.send(
+                JSON.stringify({
+                    type: "welcome",
+                    payload: {
+                        name,
+                        room: roomId,
+                        usersInRoom: allSockets.filter((u) => u.room === roomId).length,
+                    },
+                })
+            );
+
+            broadcastToRoom(roomId, {
+                type: "notification",
+                payload: { message: `${name} has joined the room.` },
+            }, socket);
+        }
+
+        if (parsedMessage.type === "chat") {
+            const currentUser = allSockets.find((x) => x.socket === socket);
+
+            if (!currentUser) return;
+
+            broadcastToRoom(currentUser.room, {
+                type: "chat",
+                payload: {
+                    sender: currentUser.name,
+                    message: parsedMessage.payload.message,
+                    room: currentUser.room,
+                },
+            }, socket);
         }
     });
 
     socket.on("close", () => {
-        users = users.filter((u) => u.id !== user.id);
-        console.log(`${user.name} disconnected`);
+        const currentUser = allSockets.find((u) => u.socket === socket);
+        if (currentUser) {
+            console.log(`${currentUser.name} disconnected from room: ${currentUser.room}`);
+
+            broadcastToRoom(currentUser.room, {
+                type: "notification",
+                payload: { message: `${currentUser.name} has left the room.` },
+            }, socket);
+        }
+        allSockets = allSockets.filter((user) => user.socket !== socket);
     });
 });
 
