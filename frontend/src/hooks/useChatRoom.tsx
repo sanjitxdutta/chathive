@@ -17,9 +17,7 @@ type Inbound =
     sender?: string;
   };
 
-const WS_URL =
-  (import.meta as any)?.env?.VITE_WS_URL ??
-  `${location.protocol === "https:" ? "wss" : "ws"}://${location.hostname}:8080`;
+const WS_URL = import.meta.env.VITE_WS_URL as string;
 
 export function useChatRoom(roomId: string) {
   const [name, setName] = useState("");
