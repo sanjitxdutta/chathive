@@ -107,7 +107,7 @@ const HeroPage: React.FC = () => {
         </p>
       </section>
 
-      <main className="max-w-3xl w-full mx-auto px-4 sm:px-6 flex flex-col gap-6 mb-10">
+      <main className="max-w-3xl w-full mx-auto px-4 sm:px-6 flex flex-col gap-6 mb-8">
 
         <div
           className="rounded-2xl border shadow-sm p-5 sm:p-6 backdrop-blur-md bg-white/70 dark:bg-white/5"
