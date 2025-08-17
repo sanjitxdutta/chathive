@@ -10,7 +10,7 @@ const ThemeToggle: React.FC = () => {
     <Button
       variant="ghost"
       onClick={toggleTheme}
-      className="flex items-center gap-2 cursor-pointer"
+      className="flex items-center gap-2 cursor-pointer px-2 sm:px-4"
       aria-label="Toggle theme"
     >
       {theme === "light" ? (

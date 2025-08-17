@@ -12,8 +12,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, className = "", rightSlot, onRightSlotClick, ...props }, ref) => {
     const { theme } = useTheme();
 
-    const baseStyles =
-      "w-full h-12 text-base rounded-2xl px-3 focus:outline-none transition pr-10";
+    const baseStyles = "w-full h-10 sm:h-12 text-sm sm:text-base rounded-2xl px-3 focus:outline-none transition pr-10";
 
     const themeStyles =
       theme === "light"
@@ -23,8 +22,12 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <label className="block text-sm w-full">
         {label && <div className="mb-1 opacity-80">{label}</div>}
-        <div className="relative">
-          <input ref={ref} className={`${themeStyles} ${baseStyles} ${className}`} {...props} />
+        <div className="relative w-full">
+          <input
+            ref={ref}
+            className={`${themeStyles} ${baseStyles} ${className}`}
+            {...props}
+          />
           {rightSlot && (
             <button
               type="button"

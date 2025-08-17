@@ -24,19 +24,10 @@ const Message: React.FC<Props> = ({ msg, selfName }) => {
   return (
     <div className={`flex mb-2 ${isSelf ? "justify-end" : "justify-start"}`}>
       <div
-        className="max-w-[75%] rounded-2xl px-3 py-2 text-sm shadow"
-        style={{
-          backgroundColor: isSelf
-            ? "#FFC107"
-            : theme === "light"
-              ? "#FFF9E6"
-              : "#2a2a1e",
-          color: isSelf
-            ? "#000000"
-            : theme === "light"
-              ? "#3b2f00"
-              : "#f5e9c6",
-        }}
+        className={`relative px-3 py-2 rounded-2xl text-sm shadow-md max-w-[75%] sm:max-w-[60%] break-words
+        ${isSelf ? "bg-[#FFC107] text-black" : theme === "light"
+            ? "bg-[#FFF9E6] text-[#3b2f00]"
+            : "bg-[#2a2a1e] text-[#f5e9c6]"}`}
       >
         {!isSelf && (
           <div className="text-[11px] opacity-70 mb-0.5">{msg.sender}</div>

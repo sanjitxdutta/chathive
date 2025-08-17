@@ -15,13 +15,14 @@ const MessageList: React.FC<MessageListProps> = ({ messages, selfName }) => {
   }, [messages.length]);
 
   return (
-    <div className="flex-1 overflow-y-auto px-3 py-3">
+    <div className="px-2 sm:px-3 py-3">
       {messages.map((m) => (
         <Message key={m.id} msg={m} selfName={selfName} />
       ))}
       <div ref={endRef} />
     </div>
   );
+
 };
 
 export default MessageList;

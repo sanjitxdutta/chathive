@@ -8,7 +8,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 const Button: React.FC<ButtonProps> = ({ variant = "primary", className = "", ...props }) => {
   const { theme } = useTheme();
 
-  const base = "px-4 py-2 rounded-2xl text-sm font-medium transition shadow focus:outline-none cursor-pointer";
+  const base = "h-10 sm:h-10 px-4 rounded-2xl text-sm font-medium transition shadow focus:outline-none cursor-pointer flex items-center justify-center";
 
   let styles = "";
   if (variant === "primary") {

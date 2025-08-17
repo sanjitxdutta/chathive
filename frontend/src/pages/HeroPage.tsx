@@ -61,7 +61,7 @@ const HeroPage: React.FC = () => {
       <section className="max-w-5xl mx-auto px-6 mt-2 mb-4 flex flex-col gap-6">
 
         <div
-          className="w-full rounded-2xl border shadow-sm p-6"
+          className="w-full rounded-2xl border shadow-sm p-6 backdrop-blur-md bg-white/70 dark:bg-white/5"
           style={{ borderColor: theme === "light" ? "#e5e5e5" : "#1f1f1f" }}
         >
           <h2 className="text-xl font-semibold mb-2">Create a new room</h2>
@@ -96,7 +96,7 @@ const HeroPage: React.FC = () => {
         </div>
 
         <div
-          className="w-full rounded-2xl border shadow-sm p-6"
+          className="w-full rounded-2xl border shadow-sm p-6 backdrop-blur-md bg-white/70 dark:bg-white/5"
           style={{ borderColor: theme === "light" ? "#e5e5e5" : "#1f1f1f" }}
         >
           <h2 className="text-xl font-semibold mb-2">Join an existing room</h2>
