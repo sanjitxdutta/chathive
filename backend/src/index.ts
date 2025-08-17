@@ -1,4 +1,5 @@
 import { WebSocketServer, WebSocket } from "ws";
+import http from "http";
 import { randomName } from "./utils/names.js";
 
 interface User {
@@ -35,9 +36,12 @@ function broadcastToRoom(room: string, message: object, exclude?: WebSocket) {
     });
 }
 
+const server = http.createServer();
 const PORT = Number(process.env.PORT) || 8080;
-const wss = new WebSocketServer({ port: PORT });
-console.log(`ChatHive backend running on ws://localhost:${PORT}`);
+const wss = new WebSocketServer({ server });
+server.listen(PORT, () => {
+    console.log(`Server is listening on port ${PORT}`);
+});
 
 wss.on("connection", (socket) => {
 
