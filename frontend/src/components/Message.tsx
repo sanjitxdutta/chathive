@@ -26,11 +26,21 @@ const Message: React.FC<Props> = ({ msg, selfName }) => {
       <div
         className="max-w-[75%] rounded-2xl px-3 py-2 text-sm shadow"
         style={{
-          backgroundColor: isSelf ? "#FFC107" : theme === "light" ? "#f5f5f5" : "#1e1e1e",
-          color: isSelf ? "#000000" : theme === "light" ? "#000000" : "#ffffff",
+          backgroundColor: isSelf
+            ? "#FFC107"
+            : theme === "light"
+              ? "#FFF9E6"
+              : "#2a2a1e",
+          color: isSelf
+            ? "#000000"
+            : theme === "light"
+              ? "#3b2f00"
+              : "#f5e9c6",
         }}
       >
-        {!isSelf && <div className="text-[11px] opacity-70 mb-0.5">{msg.sender}</div>}
+        {!isSelf && (
+          <div className="text-[11px] opacity-70 mb-0.5">{msg.sender}</div>
+        )}
         <div>{msg.text}</div>
       </div>
     </div>

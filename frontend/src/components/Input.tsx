@@ -4,32 +4,38 @@ import { useTheme } from "../context/ThemeContext";
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
+  rightSlot?: React.ReactNode;
+  onRightSlotClick?: () => void;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, className = "", ...props }, ref) => {
+  ({ label, error, className = "", rightSlot, onRightSlotClick, ...props }, ref) => {
     const { theme } = useTheme();
 
     const baseStyles =
-      "w-full rounded-2xl px-3 py-2 text-sm focus:outline-none transition";
+      "w-full h-12 text-base rounded-2xl px-3 focus:outline-none transition pr-10";
 
     const themeStyles =
       theme === "light"
-        ? "bg-white border border-black text-black focus:ring-2 focus:ring-[#FFC107]"
-        : "bg-[#121212] border border-[#FFC107] text-white focus:ring-2 focus:ring-[#FFC107]";
+        ? "bg-white text-black border border-gray-200 focus:border-black"
+        : "bg-[#0d0d0d] text-white border border-[#232323] focus:border-white";
 
     return (
-      <label className="w-full block">
-        {label && (
-          <div className="mb-1 text-sm text-gray-600 dark:text-gray-300">
-            {label}
-          </div>
-        )}
-        <input
-          ref={ref}
-          className={`${baseStyles} ${themeStyles} ${className}`}
-          {...props}
-        />
+      <label className="block text-sm w-full">
+        {label && <div className="mb-1 opacity-80">{label}</div>}
+        <div className="relative">
+          <input ref={ref} className={`${themeStyles} ${baseStyles} ${className}`} {...props} />
+          {rightSlot && (
+            <button
+              type="button"
+              onClick={onRightSlotClick}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md hover:opacity-80 focus:outline-none"
+              aria-label="icon-button"
+            >
+              {rightSlot}
+            </button>
+          )}
+        </div>
         {error && <div className="mt-1 text-xs text-red-500">{error}</div>}
       </label>
     );
@@ -37,4 +43,5 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 );
 
 Input.displayName = "Input";
+
 export default Input;

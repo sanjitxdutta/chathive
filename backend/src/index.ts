@@ -1,8 +1,6 @@
 import { WebSocketServer, WebSocket } from "ws";
 import { randomName } from "./utils/names.js";
 
-const wss = new WebSocketServer({ port: 8080 });
-
 interface User {
     socket: WebSocket;
     room: string;
@@ -12,7 +10,7 @@ interface User {
 let allSockets: User[] = [];
 
 function isValidRoomId(id: string): boolean {
-    return /^[0-9a-f]{4,32}$/.test(id);
+    return /^[0-9a-f]{4,32}$/i.test(id);
 }
 
 function generateUniqueName(room: string): string {
@@ -23,44 +21,72 @@ function generateUniqueName(room: string): string {
     return name;
 }
 
-function broadcastToRoom(room: string, message: any, excludeSocket?: WebSocket) {
-    allSockets.forEach((user) => {
-        if (user.room === room && user.socket !== excludeSocket) {
-            user.socket.send(JSON.stringify(message));
+function broadcastToRoom(room: string, message: object, exclude?: WebSocket) {
+    const data = JSON.stringify(message);
+    allSockets = allSockets.filter((u) => {
+        if (u.room !== room || u.socket === exclude) return true;
+        if (u.socket.readyState !== WebSocket.OPEN) return false;
+        try {
+            u.socket.send(data);
+            return true;
+        } catch {
+            return false;
         }
     });
 }
 
+const PORT = Number(process.env.PORT) || 8080;
+const wss = new WebSocketServer({ port: PORT });
+console.log(`ChatHive backend running on ws://localhost:${PORT}`);
+
 wss.on("connection", (socket) => {
-    console.log("New client connected");
 
-    socket.on("message", (message) => {
-        let parsedMessage;
-
+    (socket as any).isAlive = true;
+    socket.on("pong", () => ((socket as any).isAlive = true));
+    const interval = setInterval(() => {
+        if ((socket as any).isAlive === false) {
+            console.log("Terminating dead socket");
+            return socket.terminate();
+        }
+        (socket as any).isAlive = false;
         try {
-            parsedMessage = JSON.parse(message.toString());
-        } catch (err) {
-            console.error("Invalid JSON:", message.toString());
+            socket.ping();
+        } catch { }
+    }, 30000);
+
+    socket.on("message", (raw) => {
+        let parsedMessage: any;
+        try {
+            parsedMessage = JSON.parse(raw.toString());
+        } catch {
+            console.error("Invalid JSON:", raw.toString());
             return;
         }
 
         if (parsedMessage.type === "join") {
-            const { roomId } = parsedMessage.payload;
+            let { roomId } = parsedMessage.payload || {};
+            if (!roomId) {
+                socket.send(JSON.stringify({ type: "error", message: "Missing roomId" }));
+                return;
+            }
 
-            if (!roomId || !isValidRoomId(roomId)) {
+            roomId = String(roomId).toLowerCase();
+            if (!isValidRoomId(roomId)) {
                 socket.send(
                     JSON.stringify({
                         type: "error",
-                        message: "Invalid Room ID. Must be hex (4–32 chars, only 0-9a-f).",
+                        message: "Invalid Room ID. Must be 4–32 hex chars (0-9, a-f).",
                     })
                 );
                 return;
             }
 
+            allSockets = allSockets.filter((u) => u.socket !== socket);
+
             const name = generateUniqueName(roomId);
             allSockets.push({ socket, room: roomId, name });
 
-            console.log(`${name} joined room: ${roomId}`);
+            console.log(`${name} connected to ${roomId}`);
 
             socket.send(
                 JSON.stringify({
@@ -73,40 +99,49 @@ wss.on("connection", (socket) => {
                 })
             );
 
-            broadcastToRoom(roomId, {
-                type: "notification",
-                payload: { message: `${name} has joined the room.` },
-            }, socket);
+            broadcastToRoom(
+                roomId,
+                {
+                    type: "notification",
+                    payload: { message: `${name} has joined the room.` },
+                },
+                socket
+            );
         }
 
         if (parsedMessage.type === "chat") {
-            const currentUser = allSockets.find((x) => x.socket === socket);
-
+            const currentUser = allSockets.find((u) => u.socket === socket);
             if (!currentUser) return;
 
             broadcastToRoom(currentUser.room, {
                 type: "chat",
                 payload: {
                     sender: currentUser.name,
-                    message: parsedMessage.payload.message,
+                    message: parsedMessage.payload?.message,
                     room: currentUser.room,
+                    ts: Date.now(),
                 },
-            }, socket);
+            });
         }
     });
 
     socket.on("close", () => {
+        clearInterval(interval);
+
         const currentUser = allSockets.find((u) => u.socket === socket);
         if (currentUser) {
-            console.log(`${currentUser.name} disconnected from room: ${currentUser.room}`);
+            console.log(`${currentUser.name} disconnected from ${currentUser.room}`);
 
-            broadcastToRoom(currentUser.room, {
-                type: "notification",
-                payload: { message: `${currentUser.name} has left the room.` },
-            }, socket);
+            broadcastToRoom(
+                currentUser.room,
+                {
+                    type: "notification",
+                    payload: { message: `${currentUser.name} has left the room.` },
+                },
+                socket
+            );
         }
-        allSockets = allSockets.filter((user) => user.socket !== socket);
+
+        allSockets = allSockets.filter((u) => u.socket !== socket);
     });
 });
-
-console.log("ChatHive backend running on ws://localhost:8080");
