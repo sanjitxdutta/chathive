@@ -42,13 +42,19 @@ const ChatRoom: React.FC = () => {
           </Link>
 
           <div className="flex flex-col justify-center min-w-0">
-            <div className="text-[10px] sm:text-xs opacity-70 whitespace-nowrap">
-              Room
+            <div className="flex items-center gap-1 text-[10px] sm:text-xs whitespace-nowrap">
+              <span className="opacity-70">Room</span>
+              <img
+                src="/logo.png"
+                alt="logo"
+                className="h-[10px] sm:h-[12px] w-auto"
+              />
             </div>
             <div className="font-mono font-semibold text-xs sm:text-sm truncate max-w-[120px] sm:max-w-[200px]">
               {roomId}
             </div>
           </div>
+
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
