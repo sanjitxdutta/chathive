@@ -43,6 +43,13 @@ server.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT}`);
 });
 
+server.on("request", (req, res) => {
+  if (req.url === "/health") {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ status: "ok", uptime: process.uptime() }));
+  }
+});
+
 wss.on("connection", (socket) => {
 
     (socket as any).isAlive = true;
