@@ -74,28 +74,28 @@ When you leave, your view of prior messages is gone.
 
 ```
 chathive/
-├─ backend/                                                         # WebSocket server
+├─ backend/                                     # WebSocket server
 │  ├─ src/
-│  │  ├─ utils/                                                     # Helper utilities
-│  │  └─ index.ts                                                   # Server entrypoint
+│  │  ├─ utils/                                 # Helper utilities
+│  │  └─ index.ts                               # Server entrypoint
 │  ├─ .gitignore
 │  ├─ package.json
 │  ├─ package-lock.json
 │  ├─ tsconfig.json
 │  └─ tsconfig.tsbuildinfo
 │
-├─ frontend/                                                        # React + Vite client
-│  ├─ public/                                                       # Static assets (logo, preview, etc.)
+├─ frontend/                                    # React + Vite client
+│  ├─ public/                                   # Static assets 
 │  ├─ src/
-│  │  ├─ components/                                                # Reusable UI components
-│  │  ├─ context/                                                   # React Context providers
-│  │  ├─ hooks/                                                     # Custom React hooks
-│  │  ├─ pages/                                                     # Page-level routes
-│  │  ├─ types/                                                     # Shared TypeScript types
-│  │  ├─ App.tsx                                                    # Root component
-│  │  ├─ index.css                                                  # Global styles
-│  │  ├─ main.tsx                                                   # ReactDOM entry
-│  │  └─ vite-env.d.ts                                              # Vite TS types
+│  │  ├─ components/                            # Reusable UI components
+│  │  ├─ context/                               # React Context providers
+│  │  ├─ hooks/                                 # Custom React hooks
+│  │  ├─ pages/                                 # Page-level routes
+│  │  ├─ types/                                 # Shared TypeScript types
+│  │  ├─ App.tsx                                # Root component
+│  │  ├─ index.css                              # Global styles
+│  │  ├─ main.tsx                               # ReactDOM entry
+│  │  └─ vite-env.d.ts                          # Vite TS types
 │  ├─ .gitignore
 │  ├─ eslint.config.js
 │  ├─ index.html
@@ -104,7 +104,7 @@ chathive/
 │  ├─ tsconfig.app.json
 │  ├─ tsconfig.node.json
 │  ├─ tsconfig.json
-│  ├─ vercel.json                                                   # Deployment config
+│  ├─ vercel.json                               # Deployment config
 │  └─ vite.config.ts
 │
 ├─ LICENSE
