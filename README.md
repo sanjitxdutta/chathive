@@ -112,8 +112,6 @@ chathive/
 
 ```
 
-> Paths may vary slightly; the above mirrors typical placement from the shared code snippets.
-
 ## 🧑‍💻 Getting Started
 
 ### 1. Clone Repository
