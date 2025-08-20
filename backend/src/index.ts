@@ -43,12 +43,24 @@ server.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT}`);
 });
 
+//For Corn-job.org
 server.on("request", (req, res) => {
-  if (req.url === "/health") {
+  if (req.url?.startsWith("/health")) {
     res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ status: "ok", uptime: process.uptime() }));
+    res.end(
+      JSON.stringify({
+        status: "ok",
+        uptime: process.uptime().toFixed(2),
+        ts: Date.now()
+      })
+    );
+    return;
   }
+
+  res.writeHead(200, { "Content-Type": "text/plain" });
+  res.end("ChatHive backend alive");
 });
+
 
 wss.on("connection", (socket) => {
 
